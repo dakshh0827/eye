@@ -1,14 +1,16 @@
-// App.jsx - Main Application Component with Zustand State Management
+// frontend/src/App.jsx
 import React, { useEffect, useState } from 'react';
 import Scene3D from './components/Gallery/Scene3D';
 import Navigation from './components/UI/Navigation';
 import ImageModal from './components/UI/ImageModal';
+import UploadModal from './components/UI/UploadModal'; // Import the new modal
 import LoadingScreen from './components/UI/LoadingScreen';
 import { useGalleryStore } from './stores/galleryStore';
 
 function App() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  
+  const [isUploadOpen, setIsUploadOpen] = useState(false); // New state for upload modal
+
   // Get state and actions from Zustand store
   const images = useGalleryStore(state => state.images);
   const selectedImage = useGalleryStore(state => state.selectedImage);
@@ -29,35 +31,21 @@ function App() {
     const loadImages = async () => {
       try {
         await fetchImages();
-        // Simulate loading for better UX
-        setTimeout(() => {
-          setIsInitialLoad(false);
-        }, 1500);
+        setTimeout(() => setIsInitialLoad(false), 1500);
       } catch (err) {
         console.error('Failed to load images:', err);
         setIsInitialLoad(false);
       }
     };
-
     loadImages();
   }, [fetchImages]);
 
-  // Handle image click
-  const handleImageClick = (image) => {
-    setSelectedImage(image);
-  };
-
-  // Handle modal close
-  const handleModalClose = () => {
-    setSelectedImage(null);
-  };
-
-  // Handle layout change
-  const handleLayoutChange = (newLayout) => {
-    setLayout(newLayout);
-  };
-
-  // Handle search
+  // Handlers
+  const handleImageClick = (image) => setSelectedImage(image);
+  const handleModalClose = () => setSelectedImage(null);
+  const handleLayoutChange = (newLayout) => setLayout(newLayout);
+  
+  // Search Handler
   const handleSearch = async (searchTerm) => {
     try {
       await searchImages(searchTerm);
@@ -66,7 +54,7 @@ function App() {
     }
   };
 
-  // Handle like
+  // Like Handler
   const handleLike = async (imageId) => {
     try {
       await likeImage(imageId, true);
@@ -75,7 +63,7 @@ function App() {
     }
   };
 
-  // Handle navigation in modal
+  // Modal Navigation
   const handleNext = () => {
     if (!selectedImage) return;
     const currentIndex = images.findIndex(img => img._id === selectedImage._id);
@@ -90,43 +78,28 @@ function App() {
     setSelectedImage(images[prevIndex]);
   };
 
-  // Show initial loading screen
-  if (isInitialLoad) {
-    return <LoadingScreen />;
-  }
+  if (isInitialLoad) return <LoadingScreen />;
 
   return (
     <div className="w-full h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 overflow-hidden">
-      {/* Navigation Bar */}
       <Navigation
         onLayoutChange={handleLayoutChange}
         currentLayout={layout}
         onSearch={handleSearch}
         totalImages={totalImages}
+        onUpload={() => setIsUploadOpen(true)} // Pass upload handler
       />
 
-      {/* Error Display */}
+      {/* Error Toast */}
       {error && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 bg-red-500/90 text-white px-6 py-3 rounded-lg backdrop-blur-md flex items-center gap-3">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 bg-red-500/90 text-white px-6 py-3 rounded-lg backdrop-blur-md flex items-center gap-3 shadow-lg">
           <span>⚠️ {error}</span>
-          <button
-            onClick={clearError}
-            className="ml-2 hover:bg-red-600 px-2 py-1 rounded"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
-      {/* Loading Indicator */}
-      {isLoading && !isInitialLoad && (
-        <div className="fixed top-20 right-6 z-40 bg-blue-500/90 text-white px-4 py-2 rounded-lg backdrop-blur-md">
-          Loading...
+          <button onClick={clearError} className="hover:bg-white/20 px-2 rounded">✕</button>
         </div>
       )}
 
       {/* 3D Scene */}
-      <div className="w-full h-full pt-20">
+      <div className="w-full h-full pt-0">
         {images.length > 0 ? (
           <Scene3D
             images={images}
@@ -135,19 +108,23 @@ function App() {
             layout={layout}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
-                <span className="text-4xl">📷</span>
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2">No Images Yet</h2>
-              <p className="text-gray-400">Upload some images to get started</p>
+          <div className="w-full h-full flex flex-col items-center justify-center text-white">
+            <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-6">
+              <span className="text-4xl">📷</span>
             </div>
+            <h2 className="text-3xl font-bold mb-2">Gallery is Empty</h2>
+            <p className="text-gray-400 mb-6">Upload your first image to create the 3D space</p>
+            <button 
+              onClick={() => setIsUploadOpen(true)}
+              className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-semibold transition-colors"
+            >
+              Upload Now
+            </button>
           </div>
         )}
       </div>
 
-      {/* Image Detail Modal */}
+      {/* Modals */}
       {selectedImage && (
         <ImageModal
           image={selectedImage}
@@ -158,8 +135,13 @@ function App() {
         />
       )}
 
-      {/* Instructions overlay (dismissible) */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20 bg-black/60 text-white px-6 py-3 rounded-full backdrop-blur-md text-sm">
+      <UploadModal 
+        isOpen={isUploadOpen} 
+        onClose={() => setIsUploadOpen(false)} 
+      />
+
+      {/* Instructions Overlay */}
+      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20 bg-black/60 text-white px-6 py-3 rounded-full backdrop-blur-md text-sm pointer-events-none">
         🖱️ Drag to orbit • 🖱️ Scroll to zoom • 👆 Click images to view
       </div>
     </div>
