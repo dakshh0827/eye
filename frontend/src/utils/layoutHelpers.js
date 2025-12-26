@@ -62,6 +62,36 @@ export const gridLayout = (images, config = {}) => {
   });
 };
 
+export const webLayout = (images, config = {}) => {
+    const {
+      radius = 18,
+    } = config;
+  
+    return images.map((img, i) => {
+      // Random point inside a sphere (constellation style)
+      // We use spherical coordinates but randomized for organic look
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      
+      // Use cubic root to distribute points evenly in volume, 
+      // but keep them somewhat outer to form a "shell" or thick crust
+      const r = radius * (0.4 + 0.6 * Math.cbrt(Math.random())); 
+  
+      const x = r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta);
+      const z = r * Math.cos(phi);
+  
+      return {
+        ...img,
+        position: [x, y, z],
+        // Images look at the center (0,0,0) initially, 
+        // effectively facing outwards or inwards. 
+        // We'll handle Billboard behavior in the Scene to ensure visibility.
+        rotation: [0, 0, 0] 
+      };
+    });
+  };
+
 /**
  * Sphere Layout - Images distributed on sphere surface
  * Creates an immersive surrounding effect

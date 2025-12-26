@@ -3,19 +3,18 @@ import React, { useEffect, useState } from 'react';
 import Scene3D from './components/Gallery/Scene3D';
 import Navigation from './components/UI/Navigation';
 import ImageModal from './components/UI/ImageModal';
-import UploadModal from './components/UI/UploadModal'; // Import the new modal
+import UploadModal from './components/UI/UploadModal';
 import LoadingScreen from './components/UI/LoadingScreen';
 import { useGalleryStore } from './stores/galleryStore';
 
 function App() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [isUploadOpen, setIsUploadOpen] = useState(false); // New state for upload modal
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   // Get state and actions from Zustand store
   const images = useGalleryStore(state => state.images);
   const selectedImage = useGalleryStore(state => state.selectedImage);
   const layout = useGalleryStore(state => state.layout);
-  const isLoading = useGalleryStore(state => state.isLoading);
   const error = useGalleryStore(state => state.error);
   const totalImages = useGalleryStore(state => state.totalImages);
   
@@ -31,6 +30,8 @@ function App() {
     const loadImages = async () => {
       try {
         await fetchImages();
+        // Set default layout to 'web' for the space theme if not already set
+        setLayout('web');
         setTimeout(() => setIsInitialLoad(false), 1500);
       } catch (err) {
         console.error('Failed to load images:', err);
@@ -38,14 +39,13 @@ function App() {
       }
     };
     loadImages();
-  }, [fetchImages]);
+  }, [fetchImages, setLayout]);
 
   // Handlers
   const handleImageClick = (image) => setSelectedImage(image);
   const handleModalClose = () => setSelectedImage(null);
   const handleLayoutChange = (newLayout) => setLayout(newLayout);
   
-  // Search Handler
   const handleSearch = async (searchTerm) => {
     try {
       await searchImages(searchTerm);
@@ -54,7 +54,6 @@ function App() {
     }
   };
 
-  // Like Handler
   const handleLike = async (imageId) => {
     try {
       await likeImage(imageId, true);
@@ -63,7 +62,6 @@ function App() {
     }
   };
 
-  // Modal Navigation
   const handleNext = () => {
     if (!selectedImage) return;
     const currentIndex = images.findIndex(img => img._id === selectedImage._id);
@@ -81,20 +79,21 @@ function App() {
   if (isInitialLoad) return <LoadingScreen />;
 
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 overflow-hidden">
+    // CHANGED: Background to pure black for space theme
+    <div className="w-full h-screen bg-black overflow-hidden relative">
       <Navigation
         onLayoutChange={handleLayoutChange}
         currentLayout={layout}
         onSearch={handleSearch}
         totalImages={totalImages}
-        onUpload={() => setIsUploadOpen(true)} // Pass upload handler
+        onUpload={() => setIsUploadOpen(true)}
       />
 
       {/* Error Toast */}
       {error && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 bg-red-500/90 text-white px-6 py-3 rounded-lg backdrop-blur-md flex items-center gap-3 shadow-lg">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 bg-red-900/80 border border-red-500 text-white px-6 py-3 rounded-lg backdrop-blur-md flex items-center gap-3 shadow-[0_0_15px_rgba(239,68,68,0.5)]">
           <span>⚠️ {error}</span>
-          <button onClick={clearError} className="hover:bg-white/20 px-2 rounded">✕</button>
+          <button onClick={clearError} className="hover:text-red-300 px-2">✕</button>
         </div>
       )}
 
@@ -109,16 +108,16 @@ function App() {
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-white">
-            <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-6">
-              <span className="text-4xl">📷</span>
+            <div className="w-24 h-24 border border-white/20 bg-white/5 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+              <span className="text-4xl">🌌</span>
             </div>
-            <h2 className="text-3xl font-bold mb-2">Gallery is Empty</h2>
-            <p className="text-gray-400 mb-6">Upload your first image to create the 3D space</p>
+            <h2 className="text-3xl font-light tracking-wider mb-2">UNIVERSE EMPTY</h2>
+            <p className="text-gray-500 mb-6 font-mono text-sm">Initiate sequence: Upload Image</p>
             <button 
               onClick={() => setIsUploadOpen(true)}
-              className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-semibold transition-colors"
+              className="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full font-light tracking-widest transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
             >
-              Upload Now
+              UPLOAD
             </button>
           </div>
         )}
@@ -141,8 +140,10 @@ function App() {
       />
 
       {/* Instructions Overlay */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20 bg-black/60 text-white px-6 py-3 rounded-full backdrop-blur-md text-sm pointer-events-none">
-        🖱️ Drag to orbit • 🖱️ Scroll to zoom • 👆 Click images to view
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none">
+        <div className="bg-black/40 border border-white/10 text-white/60 px-6 py-2 rounded-full backdrop-blur-sm text-xs tracking-widest uppercase">
+          Orbit • Zoom • Hover to Pause
+        </div>
       </div>
     </div>
   );
