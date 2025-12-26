@@ -1,7 +1,7 @@
 // components/UI/Navigation.jsx - Top Navigation Bar
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Grid, Circle, Spiral, Waves, Upload, Filter } from 'lucide-react';
+import { Search, Grid, Circle, Loader, Waves, Upload, Filter } from 'lucide-react';
 
 const Navigation = ({ 
   onLayoutChange, 
@@ -15,7 +15,7 @@ const Navigation = ({
   const [showLayoutMenu, setShowLayoutMenu] = useState(false);
 
   const layouts = [
-    { id: 'spiral', icon: Spiral, label: 'Spiral' },
+    { id: 'Loader', icon: Loader, label: 'Loader' },
     { id: 'grid', icon: Grid, label: 'Grid' },
     { id: 'sphere', icon: Circle, label: 'Sphere' },
     { id: 'wave', icon: Waves, label: 'Wave' },

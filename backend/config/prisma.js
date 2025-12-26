@@ -1,5 +1,5 @@
-// config/prisma.js
-import { PrismaClient } from "@prisma/client";
+// config/prisma.js - Fixed Prisma Client Configuration
+import { PrismaClient } from "../generated/prisma/index.js";
 
 // Singleton pattern for Prisma Client
 const prismaClientSingleton = () => {

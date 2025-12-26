@@ -1,12 +1,47 @@
-// components/Gallery/Scene3D.jsx - Main Three.js Scene
+// components/Gallery/Scene3D.jsx - Main Three.js Scene (Fixed)
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
+import * as THREE from 'three';
 import ImageCard3D from './ImageCard3D';
 import Lighting from './Lighting';
-import { spiralLayout } from '../../utils/layoutHelpers';
+import { spiralLayout, gridLayout, sphereLayout, waveLayout } from '../../utils/layoutHelpers';
 import { entranceAnimation } from '../../utils/animationHelpers';
 import LoadingScreen from '../UI/LoadingScreen';
+
+// Stars component for atmosphere
+const Stars = () => {
+  const starsRef = useRef();
+  
+  useEffect(() => {
+    if (!starsRef.current) return;
+    
+    const positions = new Float32Array(1000 * 3);
+    
+    for (let i = 0; i < 1000; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 100;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+    }
+    
+    starsRef.current.setAttribute('position', 
+      new THREE.BufferAttribute(positions, 3)
+    );
+  }, []);
+  
+  return (
+    <points>
+      <bufferGeometry ref={starsRef} />
+      <pointsMaterial
+        color="#ffffff"
+        size={0.1}
+        sizeAttenuation
+        transparent
+        opacity={0.6}
+      />
+    </points>
+  );
+};
 
 const Scene3D = ({ 
   images, 
@@ -161,44 +196,10 @@ const Scene3D = ({
           })}
         </Suspense>
 
-        {/* Ambient particles/stars for atmosphere (optional) */}
+        {/* Ambient particles/stars for atmosphere */}
         <Stars />
       </Canvas>
     </>
-  );
-};
-
-// Optional: Star field for atmosphere
-const Stars = () => {
-  const starsRef = useRef();
-  
-  useEffect(() => {
-    if (!starsRef.current) return;
-    
-    const positions = new Float32Array(1000 * 3);
-    
-    for (let i = 0; i < 1000; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 100;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
-    }
-    
-    starsRef.current.setAttribute('position', 
-      new THREE.BufferAttribute(positions, 3)
-    );
-  }, []);
-  
-  return (
-    <points>
-      <bufferGeometry ref={starsRef} />
-      <pointsMaterial
-        color="#ffffff"
-        size={0.1}
-        sizeAttenuation
-        transparent
-        opacity={0.6}
-      />
-    </points>
   );
 };
 

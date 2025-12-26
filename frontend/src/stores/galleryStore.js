@@ -1,17 +1,28 @@
-// stores/galleryStore.js - Zustand Store for Gallery State
+// stores/galleryStore.js - Zustand Store for Gallery State (Fixed)
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Use Vite environment variable
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Axios instance with config
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  timeout: 10000
 });
+
+// Add response interceptor for error handling
+api.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('API Error:', error);
+    return Promise.reject(error);
+  }
+);
 
 // Gallery Store
 export const useGalleryStore = create(
@@ -56,8 +67,8 @@ export const useGalleryStore = create(
           
           try {
             const params = new URLSearchParams({
-              page,
-              limit,
+              page: page.toString(),
+              limit: limit.toString(),
               ...(searchTerm && { search: searchTerm }),
               ...(filterTags.length > 0 && { tags: filterTags.join(',') })
             });
@@ -65,17 +76,19 @@ export const useGalleryStore = create(
             const { data } = await api.get(`/images?${params}`);
             
             set({
-              images: data.data,
-              totalImages: data.pagination.total,
-              totalPages: data.pagination.pages,
+              images: data.data || [],
+              totalImages: data.pagination?.total || 0,
+              totalPages: data.pagination?.pages || 0,
               isLoading: false
             });
             
             return data.data;
           } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch images';
             set({ 
-              error: error.response?.data?.message || error.message,
-              isLoading: false 
+              error: errorMessage,
+              isLoading: false,
+              images: []
             });
             throw error;
           }
@@ -153,9 +166,9 @@ export const useGalleryStore = create(
             // Update image in the list
             set((state) => ({
               images: state.images.map(img => 
-                img.id === imageId ? data.data : img
+                img._id === imageId ? data.data : img
               ),
-              selectedImage: state.selectedImage?.id === imageId 
+              selectedImage: state.selectedImage?._id === imageId 
                 ? data.data 
                 : state.selectedImage,
               isLoading: false
@@ -180,9 +193,9 @@ export const useGalleryStore = create(
             
             // Remove image from the list
             set((state) => ({
-              images: state.images.filter(img => img.id !== imageId),
+              images: state.images.filter(img => img._id !== imageId),
               totalImages: state.totalImages - 1,
-              selectedImage: state.selectedImage?.id === imageId 
+              selectedImage: state.selectedImage?._id === imageId 
                 ? null 
                 : state.selectedImage,
               isLoading: false
@@ -204,11 +217,11 @@ export const useGalleryStore = create(
             // Update likes in the list
             set((state) => ({
               images: state.images.map(img =>
-                img.id === imageId 
+                img._id === imageId 
                   ? { ...img, likes: data.data.likes }
                   : img
               ),
-              selectedImage: state.selectedImage?.id === imageId
+              selectedImage: state.selectedImage?._id === imageId
                 ? { ...state.selectedImage, likes: data.data.likes }
                 : state.selectedImage
             }));
@@ -228,7 +241,7 @@ export const useGalleryStore = create(
             // Update positions in the store
             set((state) => ({
               images: state.images.map(img => {
-                const update = positions.find(p => p.id === img.id);
+                const update = positions.find(p => p.id === img._id);
                 return update ? { ...img, position3D: update.position3D } : img;
               })
             }));

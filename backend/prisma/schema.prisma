@@ -2,10 +2,12 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "mongodb"
+  url      = "mongodb+srv://dakshthakran05_db_user:ydLfZ21OQEOieMJY@cluster0.necbjry.mongodb.net/eye?appName=Cluster0"
 }
 
 model Image {
