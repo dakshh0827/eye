@@ -1,10 +1,11 @@
-// stores/galleryStore.js - Zustand Store for Gallery State (Fixed)
+// stores/galleryStore.js - Fixed Zustand Store with proper image URL handling
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import axios from 'axios';
 
-// Use Vite environment variable
+// Use Vite environment variable - FIXED: Added backend base URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 // Axios instance with config
 const api = axios.create({
@@ -23,6 +24,23 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Helper function to get full image URL
+const getFullImageUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  return `${BACKEND_BASE_URL}${path}`;
+};
+
+// Helper function to process images with full URLs
+const processImages = (images) => {
+  if (!Array.isArray(images)) return [];
+  return images.map(img => ({
+    ...img,
+    imageUrl: getFullImageUrl(img.imageUrl),
+    thumbnailUrl: getFullImageUrl(img.thumbnailUrl)
+  }));
+};
 
 // Gallery Store
 export const useGalleryStore = create(
@@ -43,9 +61,15 @@ export const useGalleryStore = create(
         error: null,
         
         // Actions
-        setImages: (images) => set({ images }),
+        setImages: (images) => set({ images: processImages(images) }),
         
-        setSelectedImage: (image) => set({ selectedImage: image }),
+        setSelectedImage: (image) => set({ 
+          selectedImage: image ? {
+            ...image,
+            imageUrl: getFullImageUrl(image.imageUrl),
+            thumbnailUrl: getFullImageUrl(image.thumbnailUrl)
+          } : null 
+        }),
         
         setLayout: (layout) => set({ layout }),
         
@@ -75,14 +99,16 @@ export const useGalleryStore = create(
             
             const { data } = await api.get(`/images?${params}`);
             
+            const processedImages = processImages(data.data || []);
+            
             set({
-              images: data.data || [],
+              images: processedImages,
               totalImages: data.pagination?.total || 0,
               totalPages: data.pagination?.pages || 0,
               isLoading: false
             });
             
-            return data.data;
+            return processedImages;
           } catch (error) {
             const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch images';
             set({ 
@@ -100,8 +126,13 @@ export const useGalleryStore = create(
           
           try {
             const { data } = await api.get(`/images/${imageId}`);
-            set({ selectedImage: data.data, isLoading: false });
-            return data.data;
+            const processedImage = {
+              ...data.data,
+              imageUrl: getFullImageUrl(data.data.imageUrl),
+              thumbnailUrl: getFullImageUrl(data.data.thumbnailUrl)
+            };
+            set({ selectedImage: processedImage, isLoading: false });
+            return processedImage;
           } catch (error) {
             set({ 
               error: error.response?.data?.message || error.message,
@@ -117,8 +148,9 @@ export const useGalleryStore = create(
           
           try {
             const { data } = await api.get(`/images/trending?limit=${limit}`);
+            const processed = processImages(data.data);
             set({ isLoading: false });
-            return data.data;
+            return processed;
           } catch (error) {
             set({ 
               error: error.response?.data?.message || error.message,
@@ -139,14 +171,20 @@ export const useGalleryStore = create(
               }
             });
             
+            const processedImage = {
+              ...data.data,
+              imageUrl: getFullImageUrl(data.data.imageUrl),
+              thumbnailUrl: getFullImageUrl(data.data.thumbnailUrl)
+            };
+            
             // Add new image to the list
             set((state) => ({
-              images: [data.data, ...state.images],
+              images: [processedImage, ...state.images],
               totalImages: state.totalImages + 1,
               isLoading: false
             }));
             
-            return data.data;
+            return processedImage;
           } catch (error) {
             set({ 
               error: error.response?.data?.message || error.message,
@@ -163,18 +201,24 @@ export const useGalleryStore = create(
           try {
             const { data } = await api.put(`/images/${imageId}`, updates);
             
+            const processedImage = {
+              ...data.data,
+              imageUrl: getFullImageUrl(data.data.imageUrl),
+              thumbnailUrl: getFullImageUrl(data.data.thumbnailUrl)
+            };
+            
             // Update image in the list
             set((state) => ({
               images: state.images.map(img => 
-                img._id === imageId ? data.data : img
+                img._id === imageId ? processedImage : img
               ),
               selectedImage: state.selectedImage?._id === imageId 
-                ? data.data 
+                ? processedImage 
                 : state.selectedImage,
               isLoading: false
             }));
             
-            return data.data;
+            return processedImage;
           } catch (error) {
             set({ 
               error: error.response?.data?.message || error.message,

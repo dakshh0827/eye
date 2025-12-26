@@ -1,4 +1,4 @@
-// components/Gallery/ImageCard3D.jsx - Individual 3D Image Card
+// components/Gallery/ImageCard3D.jsx - Fixed texture loading
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
@@ -19,28 +19,57 @@ const ImageCard3D = ({
   const materialRef = useRef();
   const glowRef = useRef();
   const [isHovered, setIsHovered] = useState(false);
-  const [textureLoaded, setTextureLoaded] = useState(false);
+  const [texture, setTexture] = useState(null);
   const [highResLoaded, setHighResLoaded] = useState(false);
+  const [error, setError] = useState(false);
 
   // Calculate aspect ratio for proper image display
   const aspectRatio = image.metadata?.width / image.metadata?.height || 1;
   const cardWidth = 3;
   const cardHeight = cardWidth / aspectRatio;
 
-  // Load thumbnail texture first (low-res for performance)
-  const thumbnailTexture = useLoader(
-    TextureLoader, 
-    image.thumbnailUrl || image.imageUrl
-  );
+  // Load texture with error handling
+  useEffect(() => {
+    if (!image.thumbnailUrl && !image.imageUrl) {
+      setError(true);
+      return;
+    }
+
+    const loader = new TextureLoader();
+    const urlToLoad = image.thumbnailUrl || image.imageUrl;
+
+    loader.load(
+      urlToLoad,
+      (loadedTexture) => {
+        loadedTexture.colorSpace = THREE.SRGBColorSpace;
+        loadedTexture.minFilter = THREE.LinearFilter;
+        loadedTexture.magFilter = THREE.LinearFilter;
+        setTexture(loadedTexture);
+        setError(false);
+      },
+      undefined,
+      (err) => {
+        console.error('Error loading texture:', urlToLoad, err);
+        setError(true);
+      }
+    );
+  }, [image.thumbnailUrl, image.imageUrl]);
 
   // Load high-res texture in background
   useEffect(() => {
-    if (!image.imageUrl || image.imageUrl === image.thumbnailUrl) return;
+    if (!texture || !image.imageUrl || image.imageUrl === image.thumbnailUrl) {
+      setHighResLoaded(true);
+      return;
+    }
 
     const loader = new TextureLoader();
     loader.load(
       image.imageUrl,
       (highResTexture) => {
+        highResTexture.colorSpace = THREE.SRGBColorSpace;
+        highResTexture.minFilter = THREE.LinearFilter;
+        highResTexture.magFilter = THREE.LinearFilter;
+        
         if (materialRef.current) {
           materialRef.current.map = highResTexture;
           materialRef.current.needsUpdate = true;
@@ -50,19 +79,10 @@ const ImageCard3D = ({
       undefined,
       (error) => {
         console.error('Error loading high-res texture:', error);
+        setHighResLoaded(true); // Set to true anyway to hide loading indicator
       }
     );
-  }, [image.imageUrl, image.thumbnailUrl]);
-
-  // Configure texture
-  useEffect(() => {
-    if (thumbnailTexture) {
-      thumbnailTexture.encoding = THREE.sRGBEncoding;
-      thumbnailTexture.minFilter = THREE.LinearFilter;
-      thumbnailTexture.magFilter = THREE.LinearFilter;
-      setTextureLoaded(true);
-    }
-  }, [thumbnailTexture]);
+  }, [texture, image.imageUrl, image.thumbnailUrl]);
 
   // Hover animation
   const handlePointerOver = (e) => {
@@ -131,9 +151,24 @@ const ImageCard3D = ({
         ease: 'power2.in'
       });
     }
-  }, [isSelected]);
+  }, [isSelected, meshRef]);
 
-  if (!textureLoaded) return null;
+  // Show placeholder if error or no texture
+  if (error || !texture) {
+    return (
+      <group ref={groupRef} position={position}>
+        <mesh>
+          <planeGeometry args={[cardWidth, cardHeight]} />
+          <meshStandardMaterial color="#333" />
+        </mesh>
+        <Html position={[0, 0, 0.1]} center>
+          <div className="bg-red-500/80 text-white px-3 py-2 rounded text-xs">
+            Failed to load
+          </div>
+        </Html>
+      </group>
+    );
+  }
 
   return (
     <group 
@@ -153,7 +188,7 @@ const ImageCard3D = ({
           <planeGeometry args={[cardWidth, cardHeight]} />
           <meshStandardMaterial
             ref={materialRef}
-            map={thumbnailTexture}
+            map={texture}
             transparent
             opacity={1}
             roughness={0.3}
@@ -206,8 +241,8 @@ const ImageCard3D = ({
                 {image.title}
               </p>
               <div className="flex gap-3 mt-1 text-xs text-gray-300">
-                <span>👁️ {image.views}</span>
-                <span>❤️ {image.likes}</span>
+                <span>👁️ {image.views || 0}</span>
+                <span>❤️ {image.likes || 0}</span>
               </div>
             </div>
           </Html>
@@ -220,7 +255,7 @@ const ImageCard3D = ({
             distanceFactor={8}
           >
             <div className="bg-blue-500 text-white px-2 py-1 rounded text-xs">
-              HD Loading...
+              HD...
             </div>
           </Html>
         )}
