@@ -173,10 +173,30 @@ function App() {
       />
 
       {/* Instructions Overlay - UPDATED TEXT SIZE (Smaller) */}
-      <div className="fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none px-4">
-        <div className="bg-black/40 border border-white/10 text-white/50 px-4 py-1.5 rounded-full backdrop-blur-sm text-[25px] sm:text-lg tracking-[0.2em] uppercase text-center shadow-lg">
+      <div className="fixed bottom-3 sm:bottom-5 lg:bottom-6 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none px-3 sm:px-4">
+        <div
+          className="
+            bg-black/40 
+            border border-white/10 
+            text-white/60 
+            backdrop-blur-sm 
+            rounded-full 
+            shadow-lg 
+            uppercase 
+            tracking-[0.18em]
+      
+            text-[10px] 
+            sm:text-xs 
+            md:text-sm 
+            lg:text-[18px]
+      
+            px-3 py-1 
+            sm:px-4 sm:py-1.5
+          "
+        >
           With Love ❤️
         </div>
+      </div>
       </div>
     </div>
   );
