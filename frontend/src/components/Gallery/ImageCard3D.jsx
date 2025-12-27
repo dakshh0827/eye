@@ -45,7 +45,7 @@ const ImageCard3D = ({
   }, [image]);
 
   const handlePointerOver = (e) => {
-    if (isMobile) return; // Disable hover on mobile
+    if (isMobile) return; 
     
     e.stopPropagation();
     document.body.style.cursor = 'pointer';
@@ -53,12 +53,19 @@ const ImageCard3D = ({
     if (onHover) onHover(); 
 
     if (meshRef?.current) {
+        // Large scale on hover (2.2x or 2.5x)
         gsap.to(meshRef.current.scale, { 
-            x: isSelected ? 1.7 : 1.5,
-            y: isSelected ? 1.7 : 1.5, 
-            z: isSelected ? 1.7 : 1.5, 
-            duration: 0.3, 
-            ease: 'power2.out' 
+            x: isSelected ? 2.5 : 2.2,
+            y: isSelected ? 2.5 : 2.2, 
+            z: isSelected ? 2.5 : 2.2, 
+            duration: 0.4, 
+            ease: 'back.out(1.2)'
+        });
+        
+        // Move slightly towards camera to avoid clipping
+        gsap.to(meshRef.current.position, {
+            z: 1,
+            duration: 0.4
         });
     }
   };
@@ -79,6 +86,12 @@ const ImageCard3D = ({
             duration: 0.3, 
             ease: 'power2.in' 
         });
+
+        // Reset position z
+        gsap.to(meshRef.current.position, {
+            z: 0,
+            duration: 0.3
+        });
     }
   };
 
@@ -92,8 +105,11 @@ const ImageCard3D = ({
     if (!meshRef?.current) return;
     
     let targetScale = 1;
-    if (isSelected) targetScale = isMobile ? 1.2 : 1.3;
-    else if (isHovered && !isMobile) targetScale = 1.5;
+    if (isHovered && !isMobile) {
+        targetScale = 2.2;
+    } else if (isSelected) {
+        targetScale = isMobile ? 1.2 : 1.3;
+    }
 
     gsap.to(meshRef.current.scale, { 
         x: targetScale, 
@@ -126,9 +142,20 @@ const ImageCard3D = ({
 
         {/* Tooltip - Only show on desktop hover */}
         {isHovered && !isMobile && (
-          <Html position={[0, -cardHeight / 2 - 0.5, 0]} center distanceFactor={10} style={{ pointerEvents: 'none' }}>
-            <div className="bg-black/80 border border-white/20 text-white px-3 py-1 rounded backdrop-blur-md">
-              <p className="text-xs font-mono tracking-widest">{image.title}</p>
+          <Html 
+            // CHANGED: Reduced the Y offset significantly. 
+            // Since this coordinate gets multiplied by the hover scale (approx 2.2x), 
+            // a small base offset (-0.25) results in the correct visual distance.
+            position={[0, -cardHeight / 2 - 0.25, 0]} 
+            center 
+            distanceFactor={10} 
+            style={{ pointerEvents: 'none', whiteSpace: 'nowrap' }}
+            zIndexRange={[100, 0]} // Ensure it appears on top
+          >
+            {/* CHANGED: Increased padding and changed text styling */}
+            <div className="bg-black/80 border border-white/30 text-white px-4 py-2 rounded-md backdrop-blur-md shadow-xl">
+              {/* CHANGED: Increased text size to text-xl and made it bold */}
+              <p className="text-xl font-bold tracking-wide drop-shadow-lg">{image.title}</p>
             </div>
           </Html>
         )}
