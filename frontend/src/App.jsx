@@ -1,4 +1,4 @@
-// frontend/src/App.jsx
+// frontend/src/App.jsx - FIXED: Proper image navigation
 import React, { useEffect, useState } from 'react';
 import Scene3D from './components/Gallery/Scene3D';
 import Navigation from './components/UI/Navigation';
@@ -30,7 +30,6 @@ function App() {
     const loadImages = async () => {
       try {
         await fetchImages();
-        // Set default layout to 'web' for the space theme if not already set
         setLayout('web');
         setTimeout(() => setIsInitialLoad(false), 1500);
       } catch (err) {
@@ -62,24 +61,68 @@ function App() {
     }
   };
 
+  // FIXED: Proper next/previous navigation - ensuring we navigate through ALL images
   const handleNext = () => {
-    if (!selectedImage) return;
-    const currentIndex = images.findIndex(img => img._id === selectedImage._id);
+    if (!selectedImage || !images || images.length === 0) {
+      console.log('No images or selected image');
+      return;
+    }
+    
+    // Find current image index by comparing _id or id
+    const currentIndex = images.findIndex(img => 
+      (img._id && img._id === selectedImage._id) || 
+      (img.id && img.id === selectedImage.id)
+    );
+    
+    console.log('Current Index:', currentIndex, 'Total Images:', images.length);
+    console.log('Current Image ID:', selectedImage._id || selectedImage.id);
+    
+    if (currentIndex === -1) {
+      console.warn('Current image not found in images array, selecting first image');
+      setSelectedImage(images[0]);
+      return;
+    }
+    
+    // Calculate next index (wrap around to start)
     const nextIndex = (currentIndex + 1) % images.length;
+    console.log('Next Index:', nextIndex);
+    console.log('Next Image:', images[nextIndex]);
+    
     setSelectedImage(images[nextIndex]);
   };
 
   const handlePrev = () => {
-    if (!selectedImage) return;
-    const currentIndex = images.findIndex(img => img._id === selectedImage._id);
+    if (!selectedImage || !images || images.length === 0) {
+      console.log('No images or selected image');
+      return;
+    }
+    
+    // Find current image index by comparing _id or id
+    const currentIndex = images.findIndex(img => 
+      (img._id && img._id === selectedImage._id) || 
+      (img.id && img.id === selectedImage.id)
+    );
+    
+    console.log('Current Index:', currentIndex, 'Total Images:', images.length);
+    console.log('Current Image ID:', selectedImage._id || selectedImage.id);
+    
+    if (currentIndex === -1) {
+      console.warn('Current image not found in images array, selecting last image');
+      setSelectedImage(images[images.length - 1]);
+      return;
+    }
+    
+    // Calculate previous index (wrap around to end)
     const prevIndex = (currentIndex - 1 + images.length) % images.length;
+    console.log('Previous Index:', prevIndex);
+    console.log('Previous Image:', images[prevIndex]);
+    
     setSelectedImage(images[prevIndex]);
   };
 
   if (isInitialLoad) return <LoadingScreen />;
 
   return (
-    // CHANGED: Background to pure black for space theme
     <div className="w-full h-screen bg-black overflow-hidden relative">
       <Navigation
         onLayoutChange={handleLayoutChange}

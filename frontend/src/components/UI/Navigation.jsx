@@ -1,4 +1,4 @@
-// frontend/src/components/UI/Navigation.jsx - Enhanced with animated upload button
+// frontend/src/components/UI/Navigation.jsx - Enhanced with fun rotating animations
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -76,7 +76,7 @@ const Navigation = ({
       <div className="max-w-7xl mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
 
-          {/* Logo */}
+          {/* Logo - with rotating emoji on hover */}
           <motion.div 
             whileHover={{ scale: 1.05 }}
             className="flex items-center gap-3 cursor-pointer"
@@ -89,7 +89,13 @@ const Navigation = ({
               }}
               transition={{ duration: 0.3 }}
             >
-              <span className="text-white text-lg">🌌</span>
+              <motion.span 
+                className="text-white text-lg"
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6, ease: "easeInOut" }}
+              >
+                🌌
+              </motion.span>
             </motion.div>
             <div>
               <h1 className="text-white font-light tracking-[0.25em] text-lg uppercase">
@@ -108,17 +114,19 @@ const Navigation = ({
           {/* Center Controls */}
           <div className="flex items-center gap-4">
             
-            {/* Layout Selector */}
+            {/* Layout Selector - with rotating icon on hover */}
             <div className="relative" ref={layoutMenuRef}>
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover="hover"
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowLayoutMenu(!showLayoutMenu)}
                 className="group px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full transition-all flex items-center gap-3 text-white/90 text-sm backdrop-blur-sm shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
               >
                 <motion.div
-                  animate={{ rotate: showLayoutMenu ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
+                  variants={{
+                    hover: { rotate: 360 }
+                  }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
                 >
                   {React.createElement(currentLayoutData?.icon || Network, { 
                     size: 18,
@@ -139,7 +147,7 @@ const Navigation = ({
                 </motion.div>
               </motion.button>
 
-              {/* Dropdown Menu */}
+              {/* Dropdown Menu - with rotating icons on hover */}
               <AnimatePresence>
                 {showLayoutMenu && (
                   <motion.div
@@ -156,7 +164,7 @@ const Navigation = ({
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          whileHover={{ scale: 1.02, x: 5 }}
+                          whileHover="hover"
                           whileTap={{ scale: 0.98 }}
                           onClick={() => {
                             onLayoutChange(layout.id);
@@ -169,7 +177,10 @@ const Navigation = ({
                           }`}
                         >
                           <motion.div
-                            whileHover={{ scale: 1.2, rotate: 5 }}
+                            variants={{
+                              hover: { rotate: 360, scale: 1.2 }
+                            }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
                             className={`p-2 rounded-lg ${
                               currentLayout === layout.id
                                 ? "bg-white/20"
@@ -204,7 +215,7 @@ const Navigation = ({
               </AnimatePresence>
             </div>
 
-            {/* Search */}
+            {/* Search - with rotating icon on hover */}
             <AnimatePresence mode="wait">
               {searchOpen || searchTerm ? (
                 <motion.form 
@@ -217,7 +228,7 @@ const Navigation = ({
                   className="relative overflow-hidden"
                 >
                   <div className="relative flex items-center">
-                    <Search className="absolute left-4 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <Search className="absolute left-4 w-6 h-6 text-gray-400 pointer-events-none" />
                     <input
                       ref={searchInputRef}
                       type="text"
@@ -229,8 +240,9 @@ const Navigation = ({
                     <motion.button
                       type="button"
                       onClick={handleSearchClear}
-                      whileHover={{ scale: 1.1, rotate: 90 }}
+                      whileHover={{ rotate: 90 }}
                       whileTap={{ scale: 0.9 }}
+                      transition={{ duration: 0.3 }}
                       className="absolute right-3 text-gray-500 hover:text-white transition-colors"
                     >
                       <X className="w-4 h-4" />
@@ -240,28 +252,32 @@ const Navigation = ({
               ) : (
                 <motion.button
                   key="search-collapsed"
-                  whileHover={{ scale: 1.1 }}
+                  whileHover="hover"
                   whileTap={{ scale: 0.9 }}
                   type="button"
                   onClick={() => setSearchOpen(true)}
-                  className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full transition-all backdrop-blur-sm hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                  className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full transition-all backdrop-blur-sm hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                 >
-                  <Search className="w-4 h-4 text-white" />
+                  <motion.div
+                    variants={{
+                      hover: { rotate: 90 }
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Search className="w-4 h-4 text-white" />
+                  </motion.div>
                 </motion.button>
               )}
             </AnimatePresence>
           </div>
 
-          {/* ENHANCED: Animated Upload Button */}
+          {/* Upload Button - with rotating icon */}
           <div className="flex items-center gap-3">
             <motion.button 
               onClick={onUpload}
-              className="relative px-6 py-2.5 bg-gradient-to-r from-white to-gray-200 text-black rounded-full flex items-center gap-2 font-bold text-xs tracking-wider shadow-lg overflow-hidden group"
-              whileHover={{ 
-                scale: 1.05,
-                boxShadow: "0 0 30px rgba(255,255,255,0.6)"
-              }}
+              whileHover="hover"
               whileTap={{ scale: 0.95 }}
+              className="relative px-6 py-2.5 bg-gradient-to-r from-white to-gray-200 text-black rounded-full flex items-center gap-2 font-bold text-xs tracking-wider shadow-lg overflow-hidden group"
             >
               {/* Animated shimmer background */}
               <motion.div
@@ -306,15 +322,17 @@ const Navigation = ({
                 ))}
               </motion.div>
               
-              {/* Upload icon with animation */}
+              {/* Upload icon with rotation animation */}
               <motion.div
-                animate={{ 
-                  y: [0, -3, 0],
+                variants={{
+                  hover: { 
+                    rotate: 360,
+                    y: [-3, 0, -3]
+                  }
                 }}
                 transition={{ 
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
+                  rotate: { duration: 0.6, ease: "easeInOut" },
+                  y: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
                 }}
                 className="relative z-10"
               >

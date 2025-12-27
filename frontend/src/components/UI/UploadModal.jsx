@@ -1,4 +1,4 @@
-// components/UI/UploadModal.jsx - Updated with black/white theme and animations
+// components/UI/UploadModal.jsx - Updated with fun rotating animations
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Image as ImageIcon, Loader, Check, AlertCircle } from 'lucide-react';
@@ -119,8 +119,9 @@ const UploadModal = ({ isOpen, onClose }) => {
               <motion.button 
                 onClick={handleClose} 
                 disabled={isLoading}
-                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileHover={{ rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.3 }}
                 className="text-gray-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X className="w-6 h-6" />
@@ -170,8 +171,9 @@ const UploadModal = ({ isOpen, onClose }) => {
                           setFile(null);
                           setPreview(null);
                         }}
-                        whileHover={{ scale: 1.1 }}
+                        whileHover={{ rotate: 90 }}
                         whileTap={{ scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
                         className="absolute top-3 right-3 p-2 bg-white hover:bg-gray-200 rounded-full text-black shadow-lg"
                       >
                         <X className="w-4 h-4" />
@@ -189,11 +191,13 @@ const UploadModal = ({ isOpen, onClose }) => {
                         className="p-4 bg-white/10 rounded-full"
                         animate={{ 
                           y: [0, -10, 0],
-                          scale: isDragOver ? 1.2 : 1
+                          scale: isDragOver ? 1.2 : 1,
+                          rotate: isDragOver ? 360 : 0
                         }}
                         transition={{ 
                           y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                          scale: { duration: 0.2 }
+                          scale: { duration: 0.2 },
+                          rotate: { duration: 0.6 }
                         }}
                       >
                         <ImageIcon className="w-10 h-10 text-white" />
@@ -271,19 +275,24 @@ const UploadModal = ({ isOpen, onClose }) => {
                     exit={{ opacity: 0, y: -10 }}
                     className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 p-3 rounded-xl"
                   >
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <motion.div
+                      animate={{ rotate: [0, -10, 10, -10, 0] }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    </motion.div>
                     <span>{error}</span>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* ENHANCED: Animated Submit Button */}
+              {/* Submit Button with fun animations */}
               <motion.button
                 type="submit"
                 disabled={isLoading || !file || uploadSuccess}
+                whileHover={!isLoading && !uploadSuccess ? "hover" : {}}
+                whileTap={!isLoading && !uploadSuccess ? { scale: 0.98 } : {}}
                 className="relative w-full py-3.5 bg-white hover:bg-gray-200 text-black rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 overflow-hidden shadow-lg"
-                whileHover={{ scale: isLoading ? 1 : 1.02, boxShadow: "0 0 30px rgba(255,255,255,0.5)" }}
-                whileTap={{ scale: isLoading ? 1 : 0.98 }}
               >
                 {/* Animated shimmer */}
                 {!isLoading && !uploadSuccess && (
@@ -296,7 +305,15 @@ const UploadModal = ({ isOpen, onClose }) => {
                 )}
                 
                 {/* Sparkles on hover */}
-                <motion.div className="absolute inset-0" initial="hidden" whileHover="visible">
+                <motion.div 
+                  className="absolute inset-0" 
+                  initial="hidden" 
+                  variants={{
+                    hidden: {},
+                    hover: {}
+                  }}
+                  whileHover="hover"
+                >
                   {[...Array(8)].map((_, i) => (
                     <motion.div
                       key={i}
@@ -307,7 +324,7 @@ const UploadModal = ({ isOpen, onClose }) => {
                       }}
                       variants={{
                         hidden: { scale: 0, opacity: 0 },
-                        visible: { 
+                        hover: { 
                           scale: [0, 1, 0],
                           opacity: [0, 1, 0],
                           transition: {
@@ -325,9 +342,10 @@ const UploadModal = ({ isOpen, onClose }) => {
                   {uploadSuccess ? (
                     <motion.div
                       key="success"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
                       exit={{ scale: 0 }}
+                      transition={{ type: "spring", stiffness: 200 }}
                       className="flex items-center gap-2 relative z-10"
                     >
                       <Check className="w-5 h-5" />
@@ -341,7 +359,12 @@ const UploadModal = ({ isOpen, onClose }) => {
                       exit={{ opacity: 0 }}
                       className="flex items-center gap-2 relative z-10"
                     >
-                      <Loader className="w-5 h-5 animate-spin" />
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Loader className="w-5 h-5" />
+                      </motion.div>
                       <span>Uploading...</span>
                     </motion.div>
                   ) : (
@@ -353,8 +376,16 @@ const UploadModal = ({ isOpen, onClose }) => {
                       className="flex items-center gap-2 relative z-10"
                     >
                       <motion.div
-                        animate={{ y: [0, -3, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
+                        variants={{
+                          hover: { 
+                            rotate: 360,
+                            y: [-3, 0, -3]
+                          }
+                        }}
+                        transition={{ 
+                          rotate: { duration: 0.6, ease: "easeInOut" },
+                          y: { duration: 1.5, repeat: Infinity }
+                        }}
                       >
                         <Upload className="w-5 h-5" />
                       </motion.div>
