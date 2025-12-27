@@ -143,7 +143,7 @@ const ImageModal = ({ image, onClose, onNext, onPrev, isMobile }) => {
           <div className="relative rounded-lg sm:rounded-2xl p-1.5 sm:p-3 bg-transparent border border-white/10 shadow-2xl">
             <div
               className="relative w-full flex items-center justify-center overflow-hidden bg-black rounded-lg"
-              style={{ height: isMobile ? '50vh' : '65vh' }}
+              style={{ height: isMobile ? '45vh' : '60vh' }}
             >
               <img
                 key={image.id}
