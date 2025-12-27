@@ -79,7 +79,8 @@ const UploadModal = ({ isOpen, onClose, isMobile }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/95 backdrop-blur-lg"
+          // CHANGED: Lighter background with blur for the overlay
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-md"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -90,11 +91,13 @@ const UploadModal = ({ isOpen, onClose, isMobile }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="relative w-full max-w-lg bg-black/90 border border-white/20 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl backdrop-blur-xl max-h-[95vh] overflow-y-auto custom-scrollbar"
+            // CHANGED: Glassmorphism effect (low opacity bg + high backdrop blur)
+            className="relative w-full max-w-lg bg-black/60 border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl backdrop-blur-2xl max-h-[95vh] overflow-y-auto custom-scrollbar"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/10 sticky top-0 bg-black/90 backdrop-blur-xl z-10">
+            {/* CHANGED: Header is now semi-transparent to blend with the glass modal */}
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-xl z-10">
               <motion.h2 
                 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2 sm:gap-3"
                 initial={{ x: -20, opacity: 0 }}
@@ -139,12 +142,13 @@ const UploadModal = ({ isOpen, onClose, isMobile }) => {
                 onDragLeave={() => setIsDragOver(false)}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
+                // CHANGED: Adjusted borders and hover states for glass theme
                 className={`relative h-44 sm:h-56 rounded-lg sm:rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden
                   ${isDragOver 
                     ? 'border-white bg-white/10 scale-105' 
                     : preview 
                       ? 'border-transparent' 
-                      : 'border-white/30 hover:border-white/50 bg-white/5 hover:bg-white/10'
+                      : 'border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10'
                   }
                 `}
               >
@@ -173,7 +177,7 @@ const UploadModal = ({ isOpen, onClose, isMobile }) => {
                         whileHover={{ rotate: 90 }}
                         whileTap={{ scale: 0.9 }}
                         transition={{ duration: 0.3 }}
-                        className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1.5 sm:p-2 bg-white hover:bg-gray-200 rounded-full text-black shadow-lg"
+                        className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1.5 sm:p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 rounded-full text-white shadow-lg"
                       >
                         <X className="w-3 h-3 sm:w-4 sm:h-4" />
                       </motion.button>
@@ -187,7 +191,7 @@ const UploadModal = ({ isOpen, onClose, isMobile }) => {
                       className="flex flex-col items-center justify-center h-full gap-2 sm:gap-3 p-4"
                     >
                       <motion.div 
-                        className="p-3 sm:p-4 bg-white/10 rounded-full"
+                        className="p-3 sm:p-4 bg-white/5 rounded-full border border-white/10"
                         animate={{ 
                           y: [0, -10, 0],
                           scale: isDragOver ? 1.2 : 1,
@@ -199,7 +203,7 @@ const UploadModal = ({ isOpen, onClose, isMobile }) => {
                           rotate: { duration: 0.6 }
                         }}
                       >
-                        <ImageIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                        <ImageIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white/80" />
                       </motion.div>
                       <div className="text-center">
                         <p className="text-white text-xs sm:text-sm font-medium mb-1">
@@ -230,37 +234,37 @@ const UploadModal = ({ isOpen, onClose, isMobile }) => {
                 transition={{ delay: 0.3 }}
               >
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-1.5 sm:mb-2">Title *</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Title *</label>
                   <input
                     type="text"
                     placeholder="Give your image a title"
                     required
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-white/5 border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all text-sm sm:text-base"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all text-sm sm:text-base backdrop-blur-sm"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-1.5 sm:mb-2">Description *</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Description *</label>
                   <textarea
                     placeholder="Describe your image"
                     required
                     rows={3}
                     value={formData.description}
                     onChange={e => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full bg-white/5 border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all resize-none text-sm sm:text-base"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all resize-none text-sm sm:text-base backdrop-blur-sm"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-1.5 sm:mb-2">Tags</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Tags</label>
                   <input
                     type="text"
                     placeholder="space, galaxy, nebula (comma separated)"
                     value={formData.tags}
                     onChange={e => setFormData({ ...formData, tags: e.target.value })}
-                    className="w-full bg-white/5 border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all text-sm sm:text-base"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all text-sm sm:text-base backdrop-blur-sm"
                   />
                 </div>
               </motion.div>
@@ -272,7 +276,7 @@ const UploadModal = ({ isOpen, onClose, isMobile }) => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="flex items-center gap-2 text-red-400 text-xs sm:text-sm bg-red-500/10 border border-red-500/20 p-2.5 sm:p-3 rounded-lg sm:rounded-xl"
+                    className="flex items-center gap-2 text-red-300 text-xs sm:text-sm bg-red-500/10 border border-red-500/20 p-2.5 sm:p-3 rounded-lg sm:rounded-xl backdrop-blur-sm"
                   >
                     <motion.div
                       animate={{ rotate: [0, -10, 10, -10, 0] }}
@@ -291,7 +295,7 @@ const UploadModal = ({ isOpen, onClose, isMobile }) => {
                 disabled={isLoading || !file || uploadSuccess}
                 whileHover={!isLoading && !uploadSuccess ? "hover" : {}}
                 whileTap={!isLoading && !uploadSuccess ? { scale: 0.98 } : {}}
-                className="relative w-full py-3 sm:py-3.5 bg-white hover:bg-gray-200 text-black rounded-lg sm:rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 sm:gap-3 overflow-hidden shadow-lg text-sm sm:text-base"
+                className="relative w-full py-3 sm:py-3.5 bg-white/90 hover:bg-white text-black rounded-lg sm:rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 sm:gap-3 overflow-hidden shadow-lg text-sm sm:text-base"
               >
                 {!isLoading && !uploadSuccess && (
                   <motion.div
