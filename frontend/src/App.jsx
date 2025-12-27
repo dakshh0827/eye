@@ -197,7 +197,6 @@ function App() {
           With Love ❤️
         </div>
       </div>
-      </div>
     </div>
   );
 }
