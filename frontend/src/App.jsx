@@ -142,7 +142,7 @@ function App() {
       {/* Instructions Overlay */}
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none">
         <div className="bg-black/40 border border-white/10 text-white/60 px-6 py-2 rounded-full backdrop-blur-sm text-xs tracking-widest uppercase">
-          Orbit • Zoom • Hover to Pause
+          With Love ❤️
         </div>
       </div>
     </div>
