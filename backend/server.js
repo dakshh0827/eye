@@ -15,7 +15,7 @@ import prisma from "./config/prisma.js";
 // Routes
 import imageRoutes from "./routes/images.js";
 import errorHandler from "./middlewares/errorHandler.js";
-
+ 
 // Fix __dirname for ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
