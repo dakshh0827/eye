@@ -1,4 +1,4 @@
-// frontend/src/components/UI/Navigation.jsx - FIXED UPLOAD BUTTON SIZE
+// frontend/src/components/UI/Navigation.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -90,7 +90,7 @@ const Navigation = ({
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="fixed top-0 left-0 right-0 z-30 bg-black/30 backdrop-blur-md border-b border-white/10"
         >
-          <div className="px-3 py-2">
+          <div className="px-4 py-3">
             <div className="flex items-center justify-between">
               {/* Logo */}
               <motion.div 
@@ -98,7 +98,7 @@ const Navigation = ({
                 className="flex items-center gap-2"
               >
                 <div className="w-8 h-8 border border-white/30 bg-gradient-to-br from-white/10 to-white/5 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">🌌</span>
+                  <span className="text-white text-sm">🌏</span>
                 </div>
                 <div>
                   <h1 className="text-white font-light tracking-[0.2em] text-sm uppercase">eye</h1>
@@ -189,10 +189,15 @@ const Navigation = ({
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="fixed top-0 left-0 right-0 z-30 bg-black/30 backdrop-blur-md border-b border-white/10"
     >
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:py-3">
-        <div className="flex items-center justify-between gap-2 sm:gap-4">
+      {/* CHANGED: 
+        1. Removed 'max-w-7xl mx-auto' to allow full width.
+        2. Added 'w-full'.
+        3. Adjusted px padding for better corner spacing.
+      */}
+      <div className="w-full px-6 sm:px-8 py-2 sm:py-3">
+        <div className="flex items-center justify-between">
 
-          {/* Logo */}
+          {/* LEFT: Logo */}
           <motion.div 
             whileHover={{ scale: 1.05 }}
             className="flex items-center gap-2 sm:gap-3 cursor-pointer flex-shrink-0"
@@ -210,7 +215,7 @@ const Navigation = ({
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.6, ease: "easeInOut" }}
               >
-                🌌
+                🌏
               </motion.span>
             </motion.div>
             <div className="hidden sm:block">
@@ -227,8 +232,9 @@ const Navigation = ({
             </div>
           </motion.div>
 
-          {/* Center Controls */}
-          <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-center">
+          {/* CENTER: Controls (Layout + Search) */}
+          {/* Using flex-1 and justify-center pushes the siblings to the far edges */}
+          <div className="flex-1 flex items-center justify-center gap-2 sm:gap-4 mx-4">
             
             {/* Layout Selector */}
             <div className="relative" ref={layoutMenuRef}>
@@ -236,7 +242,7 @@ const Navigation = ({
                 whileHover="hover"
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowLayoutMenu(!showLayoutMenu)}
-                className="group px-3 sm:px-5 py-2 sm:py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full transition-all flex items-center gap-2 sm:gap-3 text-white/90 text-xs sm:text-sm backdrop-blur-sm shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                className="group px-3 sm:px-5 py-2 sm:py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full transition-all flex items-center gap-2 sm:gap-3 text-white/90 text-xs sm:text-sm backdrop-blur-sm shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] cursor-pointer"
               >
                 <motion.div
                   variants={{
@@ -244,7 +250,7 @@ const Navigation = ({
                   }}
                   transition={{ duration: 0.6, ease: "easeInOut" }}
                 >
-                  {React.createElement(currentLayoutData?.icon || Network, { 
+                  {React.createElement(currentLayoutData?.icon || Shell, { 
                     size: window.innerWidth < 640 ? 14 : 18,
                     className: "group-hover:text-white transition-colors"
                   })}
@@ -269,7 +275,7 @@ const Navigation = ({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full mt-2 left-0 bg-black/95 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden min-w-[240px] sm:min-w-[280px] shadow-2xl shadow-black/50"
+                    className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden min-w-[240px] sm:min-w-[280px] shadow-2xl shadow-black/50"
                   >
                     <div className="p-2">
                       {layouts.map((layout, index) => (
@@ -281,7 +287,7 @@ const Navigation = ({
                           whileHover="hover"
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleLayoutSelect(layout.id)}
-                          className={`w-full px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-3 sm:gap-4 hover:bg-white/10 transition-all rounded-xl text-left group ${
+                          className={`w-full px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-3 sm:gap-4 hover:bg-white/10 transition-all rounded-xl text-left group cursor-pointer ${
                             currentLayout === layout.id 
                               ? "bg-white/10 text-white shadow-inner" 
                               : "text-gray-400"
@@ -354,7 +360,7 @@ const Navigation = ({
                       whileHover={{ rotate: 90 }}
                       whileTap={{ scale: 0.9 }}
                       transition={{ duration: 0.3 }}
-                      className="absolute right-2 sm:right-3 text-gray-500 hover:text-white transition-colors"
+                      className="absolute right-2 sm:right-3 text-gray-500 hover:text-white transition-colors  cursor-pointer"
                     >
                       <X className="w-3 h-3 sm:w-4 sm:h-4" />
                     </motion.button>
@@ -367,7 +373,7 @@ const Navigation = ({
                   whileTap={{ scale: 0.9 }}
                   type="button"
                   onClick={() => setSearchOpen(true)}
-                  className="p-2 sm:p-3.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full transition-all backdrop-blur-sm hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                  className="p-2 sm:p-3 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full transition-all backdrop-blur-sm hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] cursor-pointer"
                 >
                   <motion.div
                     variants={{
@@ -382,13 +388,13 @@ const Navigation = ({
             </AnimatePresence>
           </div>
 
-          {/* Upload Button - ADJUSTED SIZE (Reduced from md:text-base to md:text-sm) */}
+          {/* RIGHT: Upload Button */}
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <motion.button 
               onClick={handleUpload}
               whileHover="hover"
               whileTap={{ scale: 0.95 }}
-              className="group px-4 sm:px-6 py-2 sm:py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full transition-all flex items-center gap-2 sm:gap-3 text-white/90 text-xs sm:text-sm backdrop-blur-sm shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+              className="group px-4 sm:px-6 py-2 sm:py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full transition-all flex items-center gap-2 sm:gap-3 text-white/90 text-xs sm:text-sm backdrop-blur-sm shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] cursor-pointer"
             >
               <motion.div
                 variants={{

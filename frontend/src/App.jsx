@@ -172,9 +172,9 @@ function App() {
         isMobile={isMobile}
       />
 
-      {/* Instructions Overlay - UPDATED TEXT SIZE */}
-      <div className="fixed bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none px-4">
-        <div className="bg-black/40 border border-white/10 text-white/60 px-5 sm:px-8 py-2 sm:py-3 rounded-full backdrop-blur-sm text-sm sm:text-base md:text-lg lg:text-xl tracking-widest uppercase text-center">
+      {/* Instructions Overlay - UPDATED TEXT SIZE (Smaller) */}
+      <div className="fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none px-4">
+        <div className="bg-black/40 border border-white/10 text-white/50 px-4 py-1.5 rounded-full backdrop-blur-sm text-[25px] sm:text-lg tracking-[0.2em] uppercase text-center shadow-lg">
           With Love ❤️
         </div>
       </div>

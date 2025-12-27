@@ -1,8 +1,69 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// CSS for the twinkling stars background
+const starStyles = `
+  .star-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .star {
+    position: absolute;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle var(--duration) ease-in-out infinite alternate;
+  }
+
+  @keyframes twinkle {
+    0% { opacity: 0.2; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1.2); }
+  }
+
+  .orbit-ring {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(100, 200, 255, 0.8);
+    border-radius: 50%;
+    position: absolute;
+  }
+`;
+
+// Helper to generate random stars
+const generateStars = (count) => {
+  return [...Array(count)].map((_, i) => {
+    const size = Math.random() * 2 + 1 + 'px';
+    const top = Math.random() * 100 + '%';
+    const left = Math.random() * 100 + '%';
+    const duration = Math.random() * 3 + 2 + 's';
+    const delay = Math.random() * 2 + 's';
+    
+    return (
+      <div
+        key={i}
+        className="star"
+        style={{
+          width: size,
+          height: size,
+          top,
+          left,
+          '--duration': duration,
+          animationDelay: delay,
+          boxShadow: Math.random() > 0.8 ? '0 0 4px 1px rgba(150, 220, 255, 0.6)' : 'none', // Occasional blue glow
+        }}
+      />
+    );
+  });
+};
+
 const LoadingScreen = () => {
   const [progress, setProgress] = useState(0);
+  const [stars] = useState(() => generateStars(150)); // Generate stars once on mount
 
   useEffect(() => {
     // Simulate loading progress
@@ -12,9 +73,11 @@ const LoadingScreen = () => {
           clearInterval(interval);
           return 100;
         }
-        return prev + Math.random() * 15;
+        // Slow down progress as it gets higher for realism
+        const increment = Math.random() * (prev > 80 ? 5 : 15);
+        return Math.min(prev + increment, 100);
       });
-    }, 200);
+    }, 250);
 
     return () => clearInterval(interval);
   }, []);
@@ -24,142 +87,84 @@ const LoadingScreen = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900"
+        exit={{ opacity: 0, transition: { duration: 1.5 } }} // Slower exit for smooth transition to 3D
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black"
       >
-        {/* Animated background grid */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px',
-            animation: 'gridMove 20s linear infinite'
-          }} />
+        <style children={starStyles} />
+        
+        {/* Deep Space Background Layer with subtle nebula fog */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(20,30,50,0.3)_0%,_rgba(0,0,0,1)_100%)] z-0" />
+
+        {/* Stars Layer */}
+        <div className="star-container">
+          {stars}
         </div>
 
-        {/* Main content */}
-        <div className="relative z-10 text-center">
-          {/* Spinning 3D cube loader */}
-          <motion.div
-            className="mb-8 mx-auto"
-            animate={{
-              rotateX: 360,
-              rotateY: 360,
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            style={{
-              width: '80px',
-              height: '80px',
-              transformStyle: 'preserve-3d'
-            }}
-          >
-            <div className="w-full h-full relative" style={{ transformStyle: 'preserve-3d' }}>
-              {/* Cube faces */}
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 border border-white/20"
-                  style={{
-                    transform: `rotateY(${i * 90}deg) translateZ(40px)`,
-                    opacity: 0.8
-                  }}
-                />
-              ))}
-            </div>
-          </motion.div>
+        {/* Main Content Container */}
+        <div className="relative z-10 flex flex-col items-center justify-center space-y-12">
+          
+          {/* Cosmic Orbital Loader */}
+          <div className="relative w-32 h-32 flex items-center justify-center">
+            {/* Core Pulsing Sphere */}
+            <motion.div
+              animate={{ scale: [1, 1.1, 1], opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="w-12 h-12 bg-blue-900/30 rounded-full absolute z-10 blur-md"
+            />
+            <div className="w-8 h-8 bg-white/90 rounded-full absolute z-20 shadow-[0_0_15px_2px_rgba(100,200,255,0.6)]" />
 
-          {/* Title */}
-          <motion.h1
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-4xl font-bold text-white mb-4"
-          >
-            Loading Gallery
-          </motion.h1>
+            {/* Inner Fast Orbit */}
+            <motion.div
+              className="orbit-ring w-20 h-20"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            />
+             {/* Middle Orbit */}
+             <motion.div
+              className="orbit-ring w-28 h-28"
+              style={{ borderTopColor: 'rgba(150, 150, 255, 0.5)' }}
+              animate={{ rotate: -360 }}
+              transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+            />
+            {/* Outer Slow Orbit */}
+            <motion.div
+              className="orbit-ring w-40 h-40"
+              style={{ borderTopColor: 'rgba(255, 255, 255, 0.3)' }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            />
+          </div>
 
-          {/* Subtitle */}
-          <motion.p
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-gray-300 mb-8"
-          >
-            Preparing your immersive 3D experience...
-          </motion.p>
+          {/* Text and Progress Section */}
+          <div className="text-center space-y-4">
+            <motion.h1
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="text-2xl md:text-3xl font-light tracking-[0.3em] text-white uppercase"
+            >
+              Initializing Memories
+            </motion.h1>
 
-          {/* Progress bar */}
-          <div className="w-64 mx-auto mb-4">
-            <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+            {/* Progress Bar Concept - Thin subtle line */}
+            <div className="w-64 h-[2px] bg-gray-800 relative overflow-hidden rounded-full">
               <motion.div
-                className="h-full bg-gradient-to-r from-blue-500 to-purple-600"
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-400 via-white to-blue-400"
                 initial={{ width: 0 }}
-                animate={{ width: `${Math.min(progress, 100)}%` }}
-                transition={{ duration: 0.3 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ type: "spring", stiffness: 50, damping: 15 }}
+                style={{ boxShadow: '0 0 10px rgba(100, 200, 255, 0.7)' }}
               />
             </div>
-            <p className="text-white/60 text-sm mt-2">
-              {Math.min(Math.floor(progress), 100)}%
-            </p>
-          </div>
 
-          {/* Animated dots */}
-          <div className="flex justify-center gap-2">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                className="w-3 h-3 bg-white/40 rounded-full"
-                animate={{
-                  scale: [1, 1.5, 1],
-                  opacity: [0.4, 1, 0.4]
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  delay: i * 0.2
-                }}
-              />
-            ))}
+            <motion.p
+             className="text-blue-200/60 font-mono text-xs tracking-wider"
+             animate={{ opacity: [0.5, 1, 0.5] }}
+             transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              Loading assets... {Math.floor(progress)}%
+            </motion.p>
           </div>
         </div>
-
-        {/* Floating particles */}
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white/30 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0, 1, 0]
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2
-            }}
-          />
-        ))}
-
-        <style jsx>{`
-          @keyframes gridMove {
-            0% {
-              transform: translate(0, 0);
-            }
-            100% {
-              transform: translate(50px, 50px);
-            }
-          }
-        `}</style>
       </motion.div>
     </AnimatePresence>
   );
