@@ -97,8 +97,8 @@ const Navigation = ({
                 whileHover={{ scale: 1.05 }}
                 className="flex items-center gap-2"
               >
-                <div className="w-8 h-8 border border-white/30 bg-gradient-to-br from-white/10 to-white/5 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">🌏</span>
+                <div className="w-8 h-8 bg-gradient-to-br from-white/10 to-white/5 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm"><img src="/favicon.ico"/></span>
                 </div>
                 <div>
                   <h1 className="text-white font-light tracking-[0.2em] text-sm uppercase">eye</h1>
@@ -203,7 +203,7 @@ const Navigation = ({
             className="flex items-center gap-2 sm:gap-3 cursor-pointer flex-shrink-0"
           >
             <motion.div 
-              className="w-8 h-8 sm:w-10 sm:h-10 border border-white/30 bg-gradient-to-br from-white/10 to-white/5 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+              className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-white/10 to-white/5 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.15)]"
               whileHover={{ 
                 boxShadow: "0 0 30px rgba(255,255,255,0.3)",
                 borderColor: "rgba(255,255,255,0.5)"
@@ -215,7 +215,7 @@ const Navigation = ({
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.6, ease: "easeInOut" }}
               >
-                🌏
+                <img src="/favicon.ico"/>
               </motion.span>
             </motion.div>
             <div className="hidden sm:block">
