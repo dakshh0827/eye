@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const API_URL = 'https://eye-ujp8.onrender.com/api';
+const BACKEND_BASE_URL = 'https://eye-ujp8.onrender.com';
 
 const api = axios.create({
   baseURL: API_URL,
