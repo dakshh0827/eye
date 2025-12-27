@@ -1,5 +1,3 @@
-// utils/layoutHelpers.js - 3D Positioning Algorithms
-
 /**
  * Spiral Layout - Images arranged in a 3D spiral
  * Perfect for showcasing chronological content

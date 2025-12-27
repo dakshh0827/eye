@@ -1,10 +1,9 @@
-// components/UI/UploadModal.jsx - Updated with fun rotating animations
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Image as ImageIcon, Loader, Check, AlertCircle } from 'lucide-react';
 import { useGalleryStore } from '../../stores/galleryStore';
 
-const UploadModal = ({ isOpen, onClose }) => {
+const UploadModal = ({ isOpen, onClose, isMobile }) => {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [formData, setFormData] = useState({
@@ -80,7 +79,7 @@ const UploadModal = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-lg"
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/95 backdrop-blur-lg"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -91,13 +90,13 @@ const UploadModal = ({ isOpen, onClose }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="relative w-full max-w-lg bg-black/90 border border-white/20 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-xl"
+            className="relative w-full max-w-lg bg-black/90 border border-white/20 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl backdrop-blur-xl max-h-[95vh] overflow-y-auto custom-scrollbar"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/10 sticky top-0 bg-black/90 backdrop-blur-xl z-10">
               <motion.h2 
-                className="text-xl font-bold text-white flex items-center gap-3"
+                className="text-lg sm:text-xl font-bold text-white flex items-center gap-2 sm:gap-3"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
@@ -112,9 +111,9 @@ const UploadModal = ({ isOpen, onClose }) => {
                     repeatDelay: 3
                   }}
                 >
-                  <Upload className="w-6 h-6 text-white" />
+                  <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </motion.div>
-                Upload Image
+                <span className="text-base sm:text-xl">Upload Image</span>
               </motion.h2>
               <motion.button 
                 onClick={handleClose} 
@@ -124,12 +123,12 @@ const UploadModal = ({ isOpen, onClose }) => {
                 transition={{ duration: 0.3 }}
                 className="text-gray-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </motion.button>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               
               {/* Drop Zone */}
               <motion.div
@@ -140,7 +139,7 @@ const UploadModal = ({ isOpen, onClose }) => {
                 onDragLeave={() => setIsDragOver(false)}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`relative h-56 rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden
+                className={`relative h-44 sm:h-56 rounded-lg sm:rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden
                   ${isDragOver 
                     ? 'border-white bg-white/10 scale-105' 
                     : preview 
@@ -174,9 +173,9 @@ const UploadModal = ({ isOpen, onClose }) => {
                         whileHover={{ rotate: 90 }}
                         whileTap={{ scale: 0.9 }}
                         transition={{ duration: 0.3 }}
-                        className="absolute top-3 right-3 p-2 bg-white hover:bg-gray-200 rounded-full text-black shadow-lg"
+                        className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1.5 sm:p-2 bg-white hover:bg-gray-200 rounded-full text-black shadow-lg"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3 h-3 sm:w-4 sm:h-4" />
                       </motion.button>
                     </motion.div>
                   ) : (
@@ -185,10 +184,10 @@ const UploadModal = ({ isOpen, onClose }) => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="flex flex-col items-center justify-center h-full gap-3"
+                      className="flex flex-col items-center justify-center h-full gap-2 sm:gap-3 p-4"
                     >
                       <motion.div 
-                        className="p-4 bg-white/10 rounded-full"
+                        className="p-3 sm:p-4 bg-white/10 rounded-full"
                         animate={{ 
                           y: [0, -10, 0],
                           scale: isDragOver ? 1.2 : 1,
@@ -200,13 +199,13 @@ const UploadModal = ({ isOpen, onClose }) => {
                           rotate: { duration: 0.6 }
                         }}
                       >
-                        <ImageIcon className="w-10 h-10 text-white" />
+                        <ImageIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                       </motion.div>
                       <div className="text-center">
-                        <p className="text-white text-sm font-medium mb-1">
+                        <p className="text-white text-xs sm:text-sm font-medium mb-1">
                           {isDragOver ? "Drop image here" : "Click or drag image here"}
                         </p>
-                        <p className="text-gray-400 text-xs">
+                        <p className="text-gray-400 text-[10px] sm:text-xs">
                           PNG, JPG, GIF up to 10MB
                         </p>
                       </div>
@@ -225,43 +224,43 @@ const UploadModal = ({ isOpen, onClose }) => {
 
               {/* Inputs */}
               <motion.div 
-                className="space-y-4"
+                className="space-y-3 sm:space-y-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Title *</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-1.5 sm:mb-2">Title *</label>
                   <input
                     type="text"
                     placeholder="Give your image a title"
                     required
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all"
+                    className="w-full bg-white/5 border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all text-sm sm:text-base"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Description *</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-1.5 sm:mb-2">Description *</label>
                   <textarea
                     placeholder="Describe your image"
                     required
                     rows={3}
                     value={formData.description}
                     onChange={e => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all resize-none"
+                    className="w-full bg-white/5 border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all resize-none text-sm sm:text-base"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Tags</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-1.5 sm:mb-2">Tags</label>
                   <input
                     type="text"
                     placeholder="space, galaxy, nebula (comma separated)"
                     value={formData.tags}
                     onChange={e => setFormData({ ...formData, tags: e.target.value })}
-                    className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all"
+                    className="w-full bg-white/5 border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all text-sm sm:text-base"
                   />
                 </div>
               </motion.div>
@@ -273,28 +272,27 @@ const UploadModal = ({ isOpen, onClose }) => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 p-3 rounded-xl"
+                    className="flex items-center gap-2 text-red-400 text-xs sm:text-sm bg-red-500/10 border border-red-500/20 p-2.5 sm:p-3 rounded-lg sm:rounded-xl"
                   >
                     <motion.div
                       animate={{ rotate: [0, -10, 10, -10, 0] }}
                       transition={{ duration: 0.5 }}
                     >
-                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                     </motion.div>
                     <span>{error}</span>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Submit Button with fun animations */}
+              {/* Submit Button */}
               <motion.button
                 type="submit"
                 disabled={isLoading || !file || uploadSuccess}
                 whileHover={!isLoading && !uploadSuccess ? "hover" : {}}
                 whileTap={!isLoading && !uploadSuccess ? { scale: 0.98 } : {}}
-                className="relative w-full py-3.5 bg-white hover:bg-gray-200 text-black rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 overflow-hidden shadow-lg"
+                className="relative w-full py-3 sm:py-3.5 bg-white hover:bg-gray-200 text-black rounded-lg sm:rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 sm:gap-3 overflow-hidden shadow-lg text-sm sm:text-base"
               >
-                {/* Animated shimmer */}
                 {!isLoading && !uploadSuccess && (
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent"
@@ -303,40 +301,6 @@ const UploadModal = ({ isOpen, onClose }) => {
                     transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
                   />
                 )}
-                
-                {/* Sparkles on hover */}
-                <motion.div 
-                  className="absolute inset-0" 
-                  initial="hidden" 
-                  variants={{
-                    hidden: {},
-                    hover: {}
-                  }}
-                  whileHover="hover"
-                >
-                  {[...Array(8)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute w-1 h-1 bg-black rounded-full"
-                      style={{
-                        left: `${15 + i * 10}%`,
-                        top: `${20 + (i % 3) * 30}%`,
-                      }}
-                      variants={{
-                        hidden: { scale: 0, opacity: 0 },
-                        hover: { 
-                          scale: [0, 1, 0],
-                          opacity: [0, 1, 0],
-                          transition: {
-                            duration: 1,
-                            repeat: Infinity,
-                            delay: i * 0.1
-                          }
-                        }
-                      }}
-                    />
-                  ))}
-                </motion.div>
                 
                 <AnimatePresence mode="wait">
                   {uploadSuccess ? (
@@ -348,7 +312,7 @@ const UploadModal = ({ isOpen, onClose }) => {
                       transition={{ type: "spring", stiffness: 200 }}
                       className="flex items-center gap-2 relative z-10"
                     >
-                      <Check className="w-5 h-5" />
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                       <span>Upload Successful!</span>
                     </motion.div>
                   ) : isLoading ? (
@@ -363,7 +327,7 @@ const UploadModal = ({ isOpen, onClose }) => {
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                       >
-                        <Loader className="w-5 h-5" />
+                        <Loader className="w-4 h-4 sm:w-5 sm:h-5" />
                       </motion.div>
                       <span>Uploading...</span>
                     </motion.div>
@@ -387,7 +351,7 @@ const UploadModal = ({ isOpen, onClose }) => {
                           y: { duration: 1.5, repeat: Infinity }
                         }}
                       >
-                        <Upload className="w-5 h-5" />
+                        <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
                       </motion.div>
                       <span>Upload to Galaxy</span>
                     </motion.div>

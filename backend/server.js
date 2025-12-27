@@ -1,5 +1,3 @@
-// server.js - Main Express application with Prisma (ESM)
-
 import dotenv from "dotenv";
 dotenv.config();
 

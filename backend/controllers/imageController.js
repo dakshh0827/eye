@@ -1,4 +1,3 @@
-// controllers/imageController.js
 import prisma from "../config/prisma.js";
 import sharp from "sharp";
 import path from "path";

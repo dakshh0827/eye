@@ -1,4 +1,3 @@
-// stores/galleryStore.js - Debug version to fix navigation
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import axios from 'axios';

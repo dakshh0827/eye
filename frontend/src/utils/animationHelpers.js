@@ -1,4 +1,3 @@
-// utils/animationHelpers.js - GSAP Animation Presets
 import gsap from 'gsap';
 
 /**

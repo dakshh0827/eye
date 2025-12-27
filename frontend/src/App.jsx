@@ -1,4 +1,3 @@
-// frontend/src/App.jsx - FIXED: Proper image navigation
 import React, { useEffect, useState } from 'react';
 import Scene3D from './components/Gallery/Scene3D';
 import Navigation from './components/UI/Navigation';
@@ -10,6 +9,7 @@ import { useGalleryStore } from './stores/galleryStore';
 function App() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Get state and actions from Zustand store
   const images = useGalleryStore(state => state.images);
@@ -24,6 +24,17 @@ function App() {
   const searchImages = useGalleryStore(state => state.searchImages);
   const likeImage = useGalleryStore(state => state.likeImage);
   const clearError = useGalleryStore(state => state.clearError);
+
+  // Detect mobile/tablet
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Fetch images on mount
   useEffect(() => {
@@ -61,62 +72,37 @@ function App() {
     }
   };
 
-  // FIXED: Proper next/previous navigation - ensuring we navigate through ALL images
   const handleNext = () => {
-    if (!selectedImage || !images || images.length === 0) {
-      console.log('No images or selected image');
-      return;
-    }
+    if (!selectedImage || !images || images.length === 0) return;
     
-    // Find current image index by comparing _id or id
     const currentIndex = images.findIndex(img => 
       (img._id && img._id === selectedImage._id) || 
       (img.id && img.id === selectedImage.id)
     );
     
-    console.log('Current Index:', currentIndex, 'Total Images:', images.length);
-    console.log('Current Image ID:', selectedImage._id || selectedImage.id);
-    
     if (currentIndex === -1) {
-      console.warn('Current image not found in images array, selecting first image');
       setSelectedImage(images[0]);
       return;
     }
     
-    // Calculate next index (wrap around to start)
     const nextIndex = (currentIndex + 1) % images.length;
-    console.log('Next Index:', nextIndex);
-    console.log('Next Image:', images[nextIndex]);
-    
     setSelectedImage(images[nextIndex]);
   };
 
   const handlePrev = () => {
-    if (!selectedImage || !images || images.length === 0) {
-      console.log('No images or selected image');
-      return;
-    }
+    if (!selectedImage || !images || images.length === 0) return;
     
-    // Find current image index by comparing _id or id
     const currentIndex = images.findIndex(img => 
       (img._id && img._id === selectedImage._id) || 
       (img.id && img.id === selectedImage.id)
     );
     
-    console.log('Current Index:', currentIndex, 'Total Images:', images.length);
-    console.log('Current Image ID:', selectedImage._id || selectedImage.id);
-    
     if (currentIndex === -1) {
-      console.warn('Current image not found in images array, selecting last image');
       setSelectedImage(images[images.length - 1]);
       return;
     }
     
-    // Calculate previous index (wrap around to end)
     const prevIndex = (currentIndex - 1 + images.length) % images.length;
-    console.log('Previous Index:', prevIndex);
-    console.log('Previous Image:', images[prevIndex]);
-    
     setSelectedImage(images[prevIndex]);
   };
 
@@ -130,11 +116,12 @@ function App() {
         onSearch={handleSearch}
         totalImages={totalImages}
         onUpload={() => setIsUploadOpen(true)}
+        isMobile={isMobile}
       />
 
-      {/* Error Toast */}
+      {/* Error Toast - Responsive */}
       {error && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40 bg-red-900/80 border border-red-500 text-white px-6 py-3 rounded-lg backdrop-blur-md flex items-center gap-3 shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+        <div className="fixed top-16 sm:top-20 left-1/2 transform -translate-x-1/2 z-40 bg-red-900/80 border border-red-500 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg backdrop-blur-md flex items-center gap-2 sm:gap-3 shadow-[0_0_15px_rgba(239,68,68,0.5)] max-w-[90vw] text-sm sm:text-base">
           <span>⚠️ {error}</span>
           <button onClick={clearError} className="hover:text-red-300 px-2">✕</button>
         </div>
@@ -148,17 +135,18 @@ function App() {
             onImageClick={handleImageClick}
             selectedImage={selectedImage}
             layout={layout}
+            isMobile={isMobile}
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-white">
-            <div className="w-24 h-24 border border-white/20 bg-white/5 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(255,255,255,0.1)]">
-              <span className="text-4xl">🌌</span>
+          <div className="w-full h-full flex flex-col items-center justify-center text-white px-4">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 border border-white/20 bg-white/5 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+              <span className="text-2xl sm:text-4xl">🌌</span>
             </div>
-            <h2 className="text-3xl font-light tracking-wider mb-2">UNIVERSE EMPTY</h2>
-            <p className="text-gray-500 mb-6 font-mono text-sm">Initiate sequence: Upload Image</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-light tracking-wider mb-2 text-center">UNIVERSE EMPTY</h2>
+            <p className="text-gray-500 mb-4 sm:mb-6 font-mono text-xs sm:text-sm text-center">Initiate sequence: Upload Image</p>
             <button 
               onClick={() => setIsUploadOpen(true)}
-              className="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full font-light tracking-widest transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+              className="px-6 sm:px-8 py-2.5 sm:py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full font-light tracking-widest transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] text-sm sm:text-base"
             >
               UPLOAD
             </button>
@@ -174,17 +162,19 @@ function App() {
           onNext={images.length > 1 ? handleNext : null}
           onPrev={images.length > 1 ? handlePrev : null}
           onLike={handleLike}
+          isMobile={isMobile}
         />
       )}
 
       <UploadModal 
         isOpen={isUploadOpen} 
-        onClose={() => setIsUploadOpen(false)} 
+        onClose={() => setIsUploadOpen(false)}
+        isMobile={isMobile}
       />
 
-      {/* Instructions Overlay */}
-      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none">
-        <div className="bg-black/40 border border-white/10 text-white/60 px-6 py-2 rounded-full backdrop-blur-sm text-xs tracking-widest uppercase">
+      {/* Instructions Overlay - UPDATED TEXT SIZE */}
+      <div className="fixed bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none px-4">
+        <div className="bg-black/40 border border-white/10 text-white/60 px-5 sm:px-8 py-2 sm:py-3 rounded-full backdrop-blur-sm text-sm sm:text-base md:text-lg lg:text-xl tracking-widest uppercase text-center">
           With Love ❤️
         </div>
       </div>

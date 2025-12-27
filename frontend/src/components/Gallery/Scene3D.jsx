@@ -1,4 +1,3 @@
-// components/Gallery/Scene3D.jsx - Enhanced with denser stars and improved web connections
 import React, { Suspense, useEffect, useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, PerspectiveCamera, Line, Billboard } from '@react-three/drei';
@@ -9,7 +8,7 @@ import { spiralLayout, gridLayout, sphereLayout, waveLayout, webLayout } from '.
 import { entranceAnimation } from '../../utils/animationHelpers';
 import LoadingScreen from '../UI/LoadingScreen';
 
-// Enhanced dense twinkling stars for deep space feel
+// Enhanced dense twinkling stars
 const SpaceStars = () => {
   const starsRef = useRef();
   const twinkleRef = useRef([]);
@@ -17,32 +16,27 @@ const SpaceStars = () => {
   useEffect(() => {
     if (!starsRef.current) return;
     
-    // Increased star count for denser background
-    const count = 1500; // Increased from 300
+    const count = 1500;
     const positions = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
     const colors = new Float32Array(count * 3);
     twinkleRef.current = new Float32Array(count);
     
     for (let i = 0; i < count; i++) {
-      // Distribute stars in a larger volume
       positions[i * 3] = (Math.random() - 0.5) * 200;
       positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
       
-      // Vary star sizes more dramatically
       const rand = Math.random();
-      if (rand < 0.05) sizes[i] = 0.5; // Bright stars
-      else if (rand < 0.15) sizes[i] = 0.3; // Medium stars
-      else sizes[i] = 0.15; // Dim stars
+      if (rand < 0.05) sizes[i] = 0.5;
+      else if (rand < 0.15) sizes[i] = 0.3;
+      else sizes[i] = 0.15;
       
-      // Vary star colors (white to slight blue)
       const colorVariation = Math.random();
-      colors[i * 3] = 0.9 + colorVariation * 0.1; // R
-      colors[i * 3 + 1] = 0.9 + colorVariation * 0.1; // G
-      colors[i * 3 + 2] = 1.0; // B (slightly more blue)
+      colors[i * 3] = 0.9 + colorVariation * 0.1;
+      colors[i * 3 + 1] = 0.9 + colorVariation * 0.1;
+      colors[i * 3 + 2] = 1.0;
       
-      // Random twinkle phase
       twinkleRef.current[i] = Math.random() * Math.PI * 2;
     }
     
@@ -55,11 +49,9 @@ const SpaceStars = () => {
     if (!starsRef.current) return;
     const time = state.clock.getElapsedTime();
     
-    // Slow rotation
     starsRef.current.rotation.y = time * 0.01;
     starsRef.current.rotation.x = Math.sin(time * 0.005) * 0.05;
     
-    // Twinkle effect
     const sizes = starsRef.current.geometry.attributes.size.array;
     for (let i = 0; i < sizes.length; i++) {
       const baseSize = i % 20 === 0 ? 0.5 : i % 10 === 0 ? 0.3 : 0.15;
@@ -84,7 +76,7 @@ const SpaceStars = () => {
   );
 };
 
-// Enhanced Web Connections - Creates a strongly connected component
+// Web Connections
 const WebConnections = ({ images, color = "white", opacity = 0.2 }) => {
   const lines = useMemo(() => {
     if (images.length < 2) return [];
@@ -92,7 +84,6 @@ const WebConnections = ({ images, color = "white", opacity = 0.2 }) => {
     const connections = [];
     const connected = new Set();
     
-    // Helper to calculate distance
     const distance = (a, b) => {
       const dx = a.position[0] - b.position[0];
       const dy = a.position[1] - b.position[1];
@@ -100,50 +91,20 @@ const WebConnections = ({ images, color = "white", opacity = 0.2 }) => {
       return Math.sqrt(dx*dx + dy*dy + dz*dz);
     };
     
-    // Strategy: Connect each node to its 3 nearest neighbors
-    // This ensures strong connectivity
     images.forEach((imgA, i) => {
       const distances = images
         .map((imgB, j) => ({ idx: j, dist: i === j ? Infinity : distance(imgA, imgB) }))
         .sort((a, b) => a.dist - b.dist);
       
-      // Connect to 3 nearest neighbors (or fewer if not enough images)
       const connectTo = Math.min(3, distances.length - 1);
       for (let k = 0; k < connectTo; k++) {
         const j = distances[k].idx;
-        // Use a canonical order to avoid duplicate lines
         const key = i < j ? `${i}-${j}` : `${j}-${i}`;
         if (!connected.has(key)) {
           connected.add(key);
           connections.push([
             new THREE.Vector3(...imgA.position),
             new THREE.Vector3(...images[j].position)
-          ]);
-        }
-      }
-    });
-    
-    // Ensure full connectivity: If any node is isolated, connect it to nearest
-    const nodeConnections = new Map();
-    connections.forEach(([a, b]) => {
-      const aKey = `${a.x},${a.y},${a.z}`;
-      const bKey = `${b.x},${b.y},${b.z}`;
-      nodeConnections.set(aKey, (nodeConnections.get(aKey) || 0) + 1);
-      nodeConnections.set(bKey, (nodeConnections.get(bKey) || 0) + 1);
-    });
-    
-    images.forEach((img, i) => {
-      const key = `${img.position[0]},${img.position[1]},${img.position[2]}`;
-      if (!nodeConnections.has(key) || nodeConnections.get(key) === 0) {
-        // Find nearest node and connect
-        const distances = images
-          .map((imgB, j) => ({ idx: j, dist: i === j ? Infinity : distance(img, imgB) }))
-          .sort((a, b) => a.dist - b.dist);
-        
-        if (distances[0].dist !== Infinity) {
-          connections.push([
-            new THREE.Vector3(...img.position),
-            new THREE.Vector3(...images[distances[0].idx].position)
           ]);
         }
       }
@@ -187,7 +148,8 @@ const Scene3D = ({
   images, 
   onImageClick, 
   selectedImage,
-  layout = 'web' 
+  layout = 'web',
+  isMobile = false
 }) => {
   const [layoutedImages, setLayoutedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -240,11 +202,16 @@ const Scene3D = ({
       <Canvas
         className="w-full h-full"
         gl={{ antialias: true, alpha: false }}
-        dpr={[1, 2]}
+        dpr={[1, isMobile ? 1.5 : 2]}
       >
         <color attach="background" args={['#000000']} />
         
-        <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 0, 35]} fov={50} />
+        <PerspectiveCamera 
+          ref={cameraRef} 
+          makeDefault 
+          position={[0, 0, isMobile ? 45 : 35]} 
+          fov={isMobile ? 60 : 50} 
+        />
         <Lighting />
         <Environment preset="night" />
 
@@ -252,11 +219,16 @@ const Scene3D = ({
           ref={controlsRef}
           enableDamping
           dampingFactor={0.05}
-          rotateSpeed={0.5}
-          zoomSpeed={0.8}
-          minDistance={10}
-          maxDistance={60}
+          rotateSpeed={isMobile ? 0.7 : 0.5}
+          zoomSpeed={isMobile ? 1.2 : 0.8}
+          minDistance={isMobile ? 15 : 10}
+          maxDistance={isMobile ? 80 : 60}
           autoRotate={false}
+          touches={{
+            ONE: THREE.TOUCH.ROTATE,
+            TWO: THREE.TOUCH.DOLLY_PAN
+          }}
+          enablePan={!isMobile}
         />
 
         <fog attach="fog" args={['#000000', 30, 90]} />
@@ -277,7 +249,8 @@ const Scene3D = ({
                 isSelected: selectedImage?._id === image._id,
                 meshRef: meshRefs.current[index],
                 onHover: () => setIsHovering(true),
-                onHoverOut: () => setIsHovering(false)
+                onHoverOut: () => setIsHovering(false),
+                isMobile: isMobile
               };
 
               if (layout === 'web') {

@@ -1,4 +1,3 @@
-// config/prisma.js - Fixed Prisma Client Configuration
 import { PrismaClient } from "../generated/prisma/index.js";
 
 // Singleton pattern for Prisma Client
